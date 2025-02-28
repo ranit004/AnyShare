@@ -50,9 +50,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div ref={ref} className="flex-1 relative overflow-hidden">
+      <div ref={ref} className="flex-1 relative">
         {/* Hero Section */}
-        <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
+        <div className="relative z-10 flex items-center justify-center min-h-[80vh] p-4">
           <motion.div 
             className="absolute inset-0 -z-10"
             style={{ y: backgroundY }}
@@ -103,17 +103,17 @@ export default function Home() {
         </div>
 
         {/* Features Section */}
-        <div className="py-24 px-4 backdrop-blur-sm bg-background/50">
+        <div className="py-12 px-4 backdrop-blur-sm bg-background/50">
           <div className="max-w-7xl mx-auto">
             <motion.h2 
-              className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"
+              className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
               Why Choose AnyShare?
             </motion.h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {features.map((feature) => (
                 <FeatureCard key={feature.title} {...feature} />
               ))}
@@ -122,17 +122,17 @@ export default function Home() {
         </div>
 
         {/* How It Works Section */}
-        <div className="py-24 px-4">
+        <div className="py-12 px-4">
           <div className="max-w-7xl mx-auto">
             <motion.h2 
-              className="text-3xl font-bold text-center mb-16 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"
+              className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
               How It Works
             </motion.h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {steps.map((step, index) => (
                 <motion.div
                   key={step.title}
