@@ -6,29 +6,24 @@ import { randomUUID } from "crypto";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/files", async (req, res) => {
-    try {
-      const { name, size, mimeType, chunks } = req.body;
-      console.log("Received file data:", req.body); // Debug logging
+    const { name, size, mimeType } = req.body;
 
-      if (size > MAX_FILE_SIZE) {
-        return res.status(400).json({ message: "File too large" });
-      }
-
-      const shareId = randomUUID();
-      const file = await storage.createFile({
-        name,
-        size,
-        mimeType,
-        shareId,
-        chunks
-      });
-
-      console.log("Created file:", file); // Debug logging
-      res.json(file);
-    } catch (error) {
-      console.error("File creation error:", error); // Debug logging
-      res.status(400).json({ message: "Invalid file data" });
+    if (size > MAX_FILE_SIZE) {
+      return res.status(400).json({ message: "File too large" });
     }
+
+    const chunks = Math.ceil(size / CHUNK_SIZE);
+    const shareId = randomUUID();
+
+    const file = await storage.createFile({
+      name,
+      size,
+      mimeType,
+      shareId,
+      chunks
+    });
+
+    res.json(file);
   });
 
   app.post("/api/files/:shareId/chunks/:index", async (req, res) => {

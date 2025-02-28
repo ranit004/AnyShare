@@ -1,23 +1,20 @@
-import axios from "axios";
-import { insertFileSchema, type InsertFile } from "@shared/schema";
-
-const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks
+import { apiRequest } from "./queryClient";
+import { CHUNK_SIZE, type InsertFile } from "@shared/schema";
 
 export async function uploadFile(
   file: File,
   onProgress: (progress: number) => void
 ): Promise<string> {
-  // Create file entry
-  const fileData: InsertFile = {
-    filename: file.name,
+  // Create file entry with only required fields
+  const fileData = {
+    name: file.name,
     mimeType: file.type || "application/octet-stream",
     size: file.size,
-    chunks: Math.ceil(file.size / CHUNK_SIZE),
-    shareId: "", // Will be set by server
-    expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    chunks: Math.ceil(file.size / CHUNK_SIZE)
   };
 
-  const { data: createdFile } = await axios.post("/api/files", fileData);
+  const res = await apiRequest("POST", "/api/files", fileData);
+  const createdFile = await res.json();
 
   // Upload chunks
   const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
@@ -28,17 +25,10 @@ export async function uploadFile(
     const end = Math.min(start + CHUNK_SIZE, file.size);
     const chunk = file.slice(start, end);
 
-    const formData = new FormData();
-    formData.append("chunk", chunk);
-
-    await axios.post(
+    await apiRequest(
+      "POST",
       `/api/files/${createdFile.shareId}/chunks/${i}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      chunk,
     );
 
     uploadedChunks++;
