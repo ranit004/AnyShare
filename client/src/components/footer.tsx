@@ -1,4 +1,3 @@
-```typescript
 import { motion } from "framer-motion";
 import { 
   Github, 
@@ -141,4 +140,3 @@ export default function Footer() {
     </motion.footer>
   );
 }
-```
