@@ -2,28 +2,28 @@ import { useState, useCallback, useRef } from "react";
 import { useDropzone } from "react-dropzone";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Upload, X, FileIcon } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { MAX_FILE_SIZE } from "@shared/schema";
 import ShareLink from "@/components/share-link";
 import { CHUNK_SIZE } from "@shared/schema";
 import { motion, AnimatePresence } from "framer-motion";
+import React from 'react';
 
-const MotionButton = motion(Button);
-
-const MotionProgress = motion(Progress);
+// Use React.memo for motion components to prevent unnecessary re-renders
+const MotionButton = React.memo(motion(Button));
 
 export default function FileUpload() {
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [shareId, setShareId] = useState<string>();
+  const [shareId, setShareId] = useState();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadComplete, setUploadComplete] = useState(false);
-  const [fileName, setFileName] = useState<string>();
+  const [fileName, setFileName] = useState();
   const [isDragReady, setIsDragReady] = useState(false);
-  const abortControllerRef = useRef<AbortController>();
+  const abortControllerRef = useRef();
   const { toast } = useToast();
 
-  const resetUpload = () => {
+  const resetUpload = useCallback(() => {
     setShareId(undefined);
     setUploadProgress(0);
     setIsUploading(false);
@@ -33,9 +33,9 @@ export default function FileUpload() {
       abortControllerRef.current.abort();
       abortControllerRef.current = undefined;
     }
-  };
+  }, []);
 
-  const cancelUpload = () => {
+  const cancelUpload = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       abortControllerRef.current = undefined;
@@ -45,106 +45,112 @@ export default function FileUpload() {
       title: "Upload Cancelled",
       description: "File upload was cancelled",
     });
-  };
+  }, [resetUpload, toast]);
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    if (!file) return;
+  const onDrop = useCallback(
+    async (acceptedFiles) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
 
-    if (file.size > MAX_FILE_SIZE) {
-      toast({
-        title: "Error",
-        description: "File too large. Maximum size is 10GB.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      setIsUploading(true);
-      setFileName(file.name);
-      abortControllerRef.current = new AbortController();
-
-      const fileData = {
-        name: file.name,
-        mimeType: file.type || "application/octet-stream",
-        size: file.size,
-        chunks: Math.ceil(file.size / CHUNK_SIZE),
-      };
-
-      const res = await fetch("/api/files", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(fileData),
-        signal: abortControllerRef.current.signal,
-      });
-
-      if (!res.ok) throw new Error("Failed to create file");
-      const createdFile = await res.json();
-      setShareId(createdFile.shareId);
-
-      const chunks = Math.ceil(file.size / CHUNK_SIZE);
-      const uploadedChunks = new Set<number>();
-
-      for (let i = 0; i < chunks; i++) {
-        if (!abortControllerRef.current) break;
-
-        const start = i * CHUNK_SIZE;
-        const end = Math.min(start + CHUNK_SIZE, file.size);
-        const chunk = file.slice(start, end);
-
-        let retries = 3;
-        while (retries > 0) {
-          try {
-            const chunkRes = await fetch(
-              `/api/files/${createdFile.shareId}/chunks/${i}`,
-              {
-                method: "POST",
-                body: chunk,
-                signal: abortControllerRef.current.signal,
-              }
-            );
-
-            if (!chunkRes.ok) throw new Error(`Failed to upload chunk ${i}`);
-
-            uploadedChunks.add(i);
-            setUploadProgress((uploadedChunks.size / chunks) * 100);
-            break;
-          } catch (err: any) {
-            if (err.name === "AbortError") {
-              throw err;
-            }
-            retries--;
-            if (retries === 0) {
-              throw new Error(`Failed to upload chunk ${i} after multiple attempts`);
-            }
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-          }
-        }
-      }
-
-      setUploadComplete(true);
-      toast({
-        title: "Success",
-        description: "File uploaded successfully!",
-      });
-    } catch (err: any) {
-      if (err.name !== "AbortError") {
-        console.error("Upload error:", err);
+      if (file.size > MAX_FILE_SIZE) {
         toast({
           title: "Error",
-          description: err instanceof Error ? err.message : "Failed to upload file",
+          description: "File too large. Maximum size is 10GB.",
           variant: "destructive",
         });
+        return;
       }
-      resetUpload();
-    } finally {
-      setIsUploading(false);
-      abortControllerRef.current = undefined;
-    }
-  }, [toast]);
+
+      try {
+        setIsUploading(true);
+        setFileName(file.name);
+        abortControllerRef.current = new AbortController();
+
+        const fileData = {
+          name: file.name,
+          mimeType: file.type || "application/octet-stream",
+          size: file.size,
+          chunks: Math.ceil(file.size / CHUNK_SIZE),
+        };
+
+        const res = await fetch("/api/files", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(fileData),
+          signal: abortControllerRef.current.signal,
+        });
+
+        if (!res.ok) throw new Error("Failed to create file");
+        const createdFile = await res.json();
+        setShareId(createdFile.shareId);
+
+        const chunks = Math.ceil(file.size / CHUNK_SIZE);
+        const uploadedChunks = new Set();
+
+        for (let i = 0; i < chunks; i++) {
+          if (!abortControllerRef.current) break;
+
+          const start = i * CHUNK_SIZE;
+          const end = Math.min(start + CHUNK_SIZE, file.size);
+          const chunk = file.slice(start, end);
+
+          let retries = 3;
+          while (retries > 0) {
+            try {
+              const chunkRes = await fetch(
+                `/api/files/${createdFile.shareId}/chunks/${i}`,
+                {
+                  method: "POST",
+                  body: chunk,
+                  signal: abortControllerRef.current.signal,
+                }
+              );
+
+              if (!chunkRes.ok) throw new Error(`Failed to upload chunk ${i}`);
+
+              uploadedChunks.add(i);
+              setUploadProgress((uploadedChunks.size / chunks) * 100);
+              break;
+            } catch (err) {
+              if (err.name === "AbortError") {
+                throw err;
+              }
+              retries--;
+              if (retries === 0) {
+                throw new Error(
+                  `Failed to upload chunk ${i} after multiple attempts`
+                );
+              }
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
+          }
+        }
+
+        setUploadComplete(true);
+        toast({
+          title: "Success",
+          description: "File uploaded successfully!",
+        });
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Upload error:", err);
+          toast({
+            title: "Error",
+            description:
+              err instanceof Error ? err.message : "Failed to upload file",
+            variant: "destructive",
+          });
+        }
+        resetUpload();
+      } finally {
+        setIsUploading(false);
+        abortControllerRef.current = undefined;
+      }
+    },
+    [toast, resetUpload]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -154,144 +160,93 @@ export default function FileUpload() {
     onDragLeave: () => setIsDragReady(false),
   });
 
-  // Add progress ring animation
-  const progressCircle = (progress: number) => {
-    const circumference = 2 * Math.PI * 30; // radius = 30
-    return circumference - (progress / 100) * circumference;
-  };
-
   if (shareId && uploadComplete) {
     return <ShareLink shareId={shareId} onNewUpload={resetUpload} />;
   }
 
+  // Simplified animations with reduced complexity
+  const dropzoneAnimation = isDragActive
+    ? { scale: 1.03 }
+    : { scale: 1 };
+
+  // Simplified progress animations
+  const progressVariants = {
+    initial: { width: "0%" },
+    animate: { width: `${uploadProgress}%` },
+  };
+
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        className="space-y-6"
+    <div className="space-y-6">
+      <div
+        {...getRootProps()}
+        className={`
+          relative overflow-hidden rounded-xl p-8 text-center
+          transition-all duration-300
+          ${isDragActive ? "border-primary shadow-md" : "border-muted-foreground"}
+          ${isUploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-primary/5"}
+          bg-gradient-to-br from-background to-primary/5
+          border-2 border-dashed
+        `}
       >
-        <motion.div
-          {...getRootProps()}
-          className={`
-            relative overflow-hidden rounded-xl p-8 text-center
-            transition-all duration-300 transform
-            ${isDragActive ? "scale-105 border-primary shadow-lg shadow-primary/20" : "border-muted-foreground"}
-            ${isUploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-[1.02]"}
-            bg-gradient-to-br from-background via-background/80 to-primary/5
-            border-2 border-dashed shadow-2xl backdrop-blur-sm
-          `}
-          whileHover={{ scale: 1.02, transition: { type: "spring", stiffness: 400 } }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <input {...getInputProps()} />
-          <motion.div
-            className="flex flex-col items-center gap-4"
-            animate={isDragActive ? {
-              scale: [1, 1.1, 1],
-              transition: { repeat: Infinity, duration: 2 }
-            } : { scale: 1 }}
-          >
-            <motion.div
-              className="relative"
-              animate={isDragActive ? {
-                y: [0, -10, 0],
-                transition: { repeat: Infinity, duration: 1.5 }
-              } : {}}
-            >
-              <Upload className={`
-                h-16 w-16 text-primary
-                ${isDragActive ? "opacity-100" : "opacity-80"}
-              `} />
-              {fileName && (
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  className="absolute -right-2 -bottom-2"
+        <input {...getInputProps()} />
+        <div className="flex flex-col items-center gap-4">
+          <Upload className="h-16 w-16 text-primary opacity-80" />
+          <div className="space-y-2">
+            <p className="text-xl font-semibold text-primary">
+              {isUploading ? "Uploading..." : "Drop your file here"}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {fileName || "Or click to select a file"}
+            </p>
+          </div>
+        </div>
+
+        {/* Simplified decorative elements */}
+        <div className="absolute top-0 left-0 w-16 h-16 bg-gradient-to-br from-primary/10 to-transparent rounded-br-3xl" />
+        <div className="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl from-primary/10 to-transparent rounded-tl-3xl" />
+      </div>
+
+      {isUploading && (
+        <div className="space-y-4">
+          <div className="flex items-center">
+            <div className="flex-1 relative mr-24">
+              {/* Simplified progress bar */}
+              <div className="relative h-3 w-full rounded-full overflow-hidden bg-gray-100/10">
+                <div
+                  className="h-full rounded-full bg-primary relative"
+                  style={{ width: `${uploadProgress}%` }}
                 >
-                  <FileIcon className="h-6 w-6 text-primary" />
-                </motion.div>
-              )}
-            </motion.div>
-            <div className="space-y-2">
-              <motion.p
-                className="text-xl font-semibold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"
-                animate={{
-                  opacity: isDragActive ? [0.8, 1, 0.8] : 1,
-                  transition: { repeat: Infinity, duration: 2 }
-                }}
-              >
-                {isUploading ? "Uploading..." : "Drop your file here"}
-              </motion.p>
-              <p className="text-sm text-muted-foreground">
-                {fileName || "Or click to select a file"}
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Add decorative gradient corners */}
-          <div className="absolute top-0 left-0 w-16 h-16 bg-gradient-to-br from-primary/20 to-transparent rounded-br-3xl" />
-          <div className="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl from-primary/20 to-transparent rounded-tl-3xl" />
-        </motion.div>
-
-        {isUploading && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex-1 mr-4 relative">
-                <MotionProgress value={uploadProgress} className="h-2" />
-                {/* Add circular progress indicator */}
-                <svg className="w-8 h-8 absolute -right-10 top-1/2 -translate-y-1/2" viewBox="0 0 64 64">
-                  <circle
-                    className="text-primary/20"
-                    strokeWidth="4"
-                    stroke="currentColor"
-                    fill="transparent"
-                    r="30"
-                    cx="32"
-                    cy="32"
-                  />
-                  <motion.circle
-                    className="text-primary"
-                    strokeWidth="4"
-                    stroke="currentColor"
-                    fill="transparent"
-                    r="30"
-                    cx="32"
-                    cy="32"
-                    initial={{ strokeDashoffset: progressCircle(0) }}
-                    animate={{ strokeDashoffset: progressCircle(uploadProgress) }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </svg>
+                  {/* Single shine effect instead of multiple */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shine" />
+                </div>
               </div>
-              <MotionButton
-                variant="destructive"
-                size="sm"
-                onClick={cancelUpload}
-                className="shrink-0"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <X className="h-4 w-4 mr-2" />
-                Cancel
-              </MotionButton>
+
+              <div className="absolute -right-16 top-1/2 -translate-y-1/2">
+                <div className="bg-primary/10 px-2 py-1 rounded-full">
+                  <span className="text-xs font-medium text-primary">
+                    {Math.round(uploadProgress)}%
+                  </span>
+                </div>
+              </div>
             </div>
-            <motion.p
-              className="text-sm text-center text-muted-foreground"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ repeat: Infinity, duration: 2 }}
+
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={cancelUpload}
+              className="shrink-0 rounded-full min-w-20"
             >
-              Uploading... {Math.round(uploadProgress)}%
-            </motion.p>
-          </motion.div>
-        )}
-      </motion.div>
-    </AnimatePresence>
+              <X className="h-4 w-4 mr-1" />
+              Cancel
+            </Button>
+          </div>
+
+          <div className="flex items-center justify-center text-sm text-muted-foreground">
+            <span>Uploading</span>
+            <span className="mx-1 animate-pulse">...</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Download from "@/pages/download";
 import ThemeToggle from "@/components/theme-toggle";
+import { ThemeProvider } from "@/components/theme-provider"; // ✅ Import ThemeProvider
 
 function Router() {
   return (
@@ -19,11 +20,20 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeToggle />
-      <Router />
-      <Toaster />
-    </QueryClientProvider>
+    <ThemeProvider> {/* ✅ Wrap the entire app with ThemeProvider */}
+      <QueryClientProvider client={queryClient}>
+        {/* Theme Toggle Button - Fixed position */}
+        <div className="fixed top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
+
+        {/* Main App Router */}
+        <Router />
+        
+        {/* Notifications */}
+        <Toaster />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

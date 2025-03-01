@@ -6,22 +6,28 @@ import { useEffect, useState } from "react";
 const MotionButton = motion(Button);
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof window !== "undefined") {
+      return (
+        (localStorage.getItem("theme") as "light" | "dark" | null) ||
+        (window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light")
+      );
+    }
+    return "dark";
+  });
 
   useEffect(() => {
-    // Initialize theme from localStorage or system preference
-    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
-    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-    const initialTheme = savedTheme || systemTheme;
-    setTheme(initialTheme);
-    document.documentElement.classList.toggle("dark", initialTheme === "dark");
-  }, []);
+    if (typeof window !== "undefined") {
+      document.documentElement.classList.remove("light", "dark");
+      document.documentElement.classList.add(theme);
+      localStorage.setItem("theme", theme);
+    }
+  }, [theme]);
 
   const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
-    localStorage.setItem("theme", newTheme);
+    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
   };
 
   return (
