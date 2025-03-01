@@ -157,7 +157,7 @@ export default function DownloadPage() {
       {/* Media player - simplified animations */}
       {playerOpen && isPlayable && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="relative w-full max-w-4xl bg-slate-900 rounded-lg shadow-lg border border-white">
+          <div className="relative w-full max-w-4xl bg-slate-900 rounded-xl shadow-lg border border-white">
             <Button 
               size="sm" 
               className="absolute top-4 right-4 z-10 rounded-full h-8 w-8 p-0 bg-black/50 text-white"
@@ -167,8 +167,8 @@ export default function DownloadPage() {
             </Button>
             
             {loadingMedia && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 z-20">
-                <Progress value={playbackProgress} className="h-2 w-64 mb-3" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 z-20 rounded-xl">
+                <Progress value={playbackProgress} className="h-2 w-64 mb-3 rounded-full" />
                 <p className="text-white text-sm">Loading ({Math.round(playbackProgress)}%)</p>
               </div>
             )}
@@ -176,13 +176,13 @@ export default function DownloadPage() {
             {['mp4', 'webm', 'mov'].includes(fileExt) ? (
               <video 
                 ref={mediaRef} 
-                className="w-full h-auto max-h-[70vh]" 
+                className="w-full h-auto max-h-[70vh] rounded-xl" 
                 controls
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
               />
             ) : (
-              <div className="p-8 bg-gradient-to-br from-black to-gray-800 flex flex-col items-center justify-center min-h-[300px]">
+              <div className="p-8 bg-gradient-to-br from-black to-gray-800 flex flex-col items-center justify-center min-h-[300px] rounded-xl">
                 <FileIcon className={`h-16 w-16 ${iconColor} mb-4`} />
                 <h3 className="text-white text-lg mb-4">{file?.name}</h3>
                 <audio 
@@ -207,7 +207,7 @@ export default function DownloadPage() {
           </div>
         ) : !file ? (
           <div className="w-full max-w-md">
-            <Card className="bg-slate-900/90 border border-white shadow-lg text-white">
+            <Card className="bg-slate-900/90 border border-white shadow-lg text-white rounded-xl overflow-hidden">
               <CardContent className="pt-6 text-center space-y-6">
                 <div className="mx-auto w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center">
                   <FileIcon className="h-8 w-8 text-red-500" />
@@ -216,7 +216,7 @@ export default function DownloadPage() {
                 <p className="text-blue-200/80">This file may have expired or been removed</p>
                 <Button 
                   variant="outline" 
-                  className="bg-slate-800/50 border-red-500/30 text-red-400"
+                  className="bg-slate-800/50 border-red-500/30 text-red-400 rounded-xl"
                   onClick={() => window.location.href = '/'}
                 >
                   Return Home
@@ -226,10 +226,10 @@ export default function DownloadPage() {
           </div>
         ) : (
           <div className="w-full max-w-md">
-            <Card className="bg-slate-900/90 border border-white shadow-lg text-white">
+            <Card className="bg-slate-900/90 border border-white shadow-lg text-white rounded-xl overflow-hidden">
               <CardContent className="pt-6 space-y-6">
                 <div className="flex items-center gap-4">
-                  <div className={`flex-shrink-0 w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center ${iconColor}`}>
+                  <div className={`flex-shrink-0 w-14 h-14 rounded-xl bg-blue-500/20 flex items-center justify-center ${iconColor}`}>
                     <FileIcon className={`h-7 w-7 ${iconColor}`} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -252,7 +252,7 @@ export default function DownloadPage() {
                   <div className="space-y-3">
                     <Progress 
                       value={downloadProgress} 
-                      className="h-2 bg-blue-800/30" 
+                      className="h-2 bg-blue-800/30 rounded-full" 
                     />
                     <div className="flex justify-between items-center">
                       <p className="text-sm text-blue-200/70">Downloading...</p>
@@ -261,7 +261,7 @@ export default function DownloadPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 justify-center p-2 rounded-lg bg-blue-900/30 border border-blue-500/20">
+                    <div className="flex items-center gap-2 justify-center p-2 rounded-xl bg-blue-900/30 border border-blue-500/20">
                       <ShieldCheck className="h-4 w-4 text-green-400" />
                       <p className="text-xs text-blue-200/80">
                         {isPlayable ? "File can be played online" : "Files up to 10GB supported"}
@@ -272,7 +272,7 @@ export default function DownloadPage() {
                       {isPlayable && (
                         <Button 
                           variant="outline"
-                          className="w-full border-blue-400/40 hover:bg-blue-800/40 text-blue-300"
+                          className="w-full border-blue-400/40 hover:bg-blue-800/40 text-blue-300 rounded-xl"
                           onClick={() => {
                             setPlayerOpen(true);
                             if (!mediaRef.current?.src) {
@@ -286,7 +286,7 @@ export default function DownloadPage() {
                       )}
                       
                       <Button 
-                        className="w-full bg-blue-600 hover:bg-blue-500 text-white"
+                        className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-xl"
                         onClick={downloadFile}
                       >
                         <Download className="mr-2 h-4 w-4" />
@@ -318,7 +318,7 @@ export default function DownloadPage() {
               href={socialLinks.github} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-blue-300 hover:text-blue-100 transition-colors"
+              className="text-blue-300 hover:text-blue-100 transition-colors rounded-full p-2 hover:bg-blue-800/30"
               aria-label="GitHub"
             >
               <Github size={18} />
@@ -327,7 +327,7 @@ export default function DownloadPage() {
               href={socialLinks.twitter} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-blue-300 hover:text-blue-100 transition-colors" 
+              className="text-blue-300 hover:text-blue-100 transition-colors rounded-full p-2 hover:bg-blue-800/30" 
               aria-label="Twitter/X"
             >
               <Twitter size={18} />

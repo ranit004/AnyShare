@@ -180,7 +180,7 @@ export default function FileUpload() {
       <div
         {...getRootProps()}
         className={`
-          relative overflow-hidden rounded-xl p-8 text-center
+          relative overflow-hidden rounded-2xl p-8 text-center
           transition-all duration-300
           ${isDragActive ? "border-primary shadow-md" : "border-muted-foreground"}
           ${isUploading ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-primary/5"}
@@ -201,7 +201,7 @@ export default function FileUpload() {
           </div>
         </div>
 
-        {/* Simplified decorative elements */}
+        {/* Simplified decorative elements with rounded corners */}
         <div className="absolute top-0 left-0 w-16 h-16 bg-gradient-to-br from-primary/10 to-transparent rounded-br-3xl" />
         <div className="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl from-primary/10 to-transparent rounded-tl-3xl" />
       </div>
@@ -210,7 +210,7 @@ export default function FileUpload() {
         <div className="space-y-4">
           <div className="flex items-center">
             <div className="flex-1 relative mr-24">
-              {/* Simplified progress bar */}
+              {/* Rounded progress bar */}
               <div className="relative h-3 w-full rounded-full overflow-hidden bg-gray-100/10">
                 <div
                   className="h-full rounded-full bg-primary relative"

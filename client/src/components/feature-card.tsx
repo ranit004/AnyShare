@@ -32,7 +32,7 @@ export default function FeatureCard({
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
     >
-      <Card className="overflow-hidden backdrop-blur-sm bg-background/80 border-primary/20 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300">
+      <Card className="overflow-hidden backdrop-blur-sm bg-background/80 border-primary/20 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 rounded-xl">
         <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
           <motion.div
             whileHover={{ scale: 1.1, rotate: 5 }}

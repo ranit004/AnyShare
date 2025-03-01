@@ -7,7 +7,6 @@ import FeatureCard from "@/components/feature-card";
 import { Github, Twitter } from "lucide-react";
 
 // Fixed dark blue theme (no theme changing)
-// Fixed dark blue theme (no theme changing)
 const THEME = {
   darkBlue: "#0a192f",
   deeperBlue: "#061429",
@@ -120,13 +119,13 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-[#0a192f]">
       {/* Navigation Bar - simplified */}
-      <nav className="flex items-center justify-between p-4 z-20 sticky top-0 backdrop-blur-md bg-[#0a192f]/80">
+      <nav className="flex items-center justify-between p-4 z-20 sticky top-0 backdrop-blur-md bg-[#0a192f]/80 rounded-b-xl">
         <div className="flex items-center space-x-6">
           <a 
             href="https://github.com/ranit004" 
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white hover:text-blue-400 transition-colors"
+            className="text-white hover:text-blue-400 transition-colors rounded-full p-2 hover:bg-blue-800/30"
           >
             <Github size={24} />
           </a>
@@ -134,7 +133,7 @@ export default function Home() {
             href="https://x.com/Ranit_bro" 
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white hover:text-blue-400 transition-colors"
+            className="text-white hover:text-blue-400 transition-colors rounded-full p-2 hover:bg-blue-800/30"
           >
             <Twitter size={24} />
           </a>
@@ -170,7 +169,7 @@ export default function Home() {
 
           <div className="w-full max-w-2xl">
             {/* Card with white plain border */}
-            <Card className="backdrop-blur-md bg-white/10 border-white border-2 shadow-lg">
+            <Card className="backdrop-blur-md bg-white/10 border-white border-2 shadow-lg rounded-xl overflow-hidden">
               <CardContent className="pt-6 space-y-6">
                 <div className="text-center space-y-2">
                   <h1 className="text-5xl font-bold text-white">
@@ -189,7 +188,7 @@ export default function Home() {
         </div>
 
         {/* Features Section - simplified animations */}
-        <div className="py-12 px-4 bg-[#0a192f]/70 bg-gradient-to-b from-[#0a192f]/90 to-[#0f2d5a]/80 relative">
+        <div className="py-12 px-4 bg-[#0a192f]/70 bg-gradient-to-b from-[#0a192f]/90 to-[#0f2d5a]/80 relative rounded-t-xl">
           <div className="max-w-7xl mx-auto relative z-10">
             <h2 className="text-3xl font-bold text-center mb-8 text-white">
               Why Choose <span style={{ color: THEME.accentBlue }}>AnyShare</span>?
@@ -213,7 +212,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {steps.map((step, index) => (
                 <div key={step.title} className="relative">
-                  <div className="flex items-start space-x-4 hover:translate-x-1 transition-transform">
+                  <div className="flex items-start space-x-4 hover:translate-x-1 transition-transform p-4 rounded-xl hover:bg-blue-800/20">
                     <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
                       <span className="text-xl font-bold text-[#1e90ff]">{index + 1}</span>
                     </div>
@@ -229,7 +228,7 @@ export default function Home() {
         </div>
 
         {/* Footer - simplified */}
-        <footer className="py-6 px-4 bg-[#061429]">
+        <footer className="py-6 px-4 bg-[#061429] rounded-t-xl">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
             <Logo onClick={handleLogoClick} className="mb-4 md:mb-0" />
             <div className="text-blue-100/60 text-sm">

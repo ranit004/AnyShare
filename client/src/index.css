@@ -105,3 +105,12 @@
 .theme-transition {
   @apply transition-all duration-300;
 }
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: #0a192f;
+  color: white;
+}

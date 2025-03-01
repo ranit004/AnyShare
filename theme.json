@@ -1,6 +1,11 @@
 {
-  "variant": "vibrant",
-  "primary": "hsl(250, 95%, 60%)",
-  "appearance": "system",
-  "radius": 1.5
+  "themes": {
+    "dark": {
+      "background": "#0a192f",
+      "foreground": "#ffffff",
+      "card": "#061429",
+      "primary": "#1e90ff",
+      "border": "#ffffff"
+    }
+  }
 }
