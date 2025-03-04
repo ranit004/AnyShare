@@ -1,16 +1,14 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import FileUpload from "@/components/file-upload";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Github, Twitter, ArrowRight, Mail } from "lucide-react";
 import FeatureCard from "@/components/feature-card";
-import { Github, Twitter, ArrowRight } from "lucide-react";
 
-// Enhanced color theme
 const THEME = {
   darkBlue: "#0a192f",
   deeperBlue: "#061429",
-  accentBlue: "#3b82f6", // Brighter blue for better contrast
+  accentBlue: "#3b82f6",
   neonPurple: "#8b5cf6",
   neonPink: "#ec4899",
 };
@@ -51,163 +49,71 @@ const steps = [
   },
 ];
 
-// 3D Background using CSS and DOM elements (no Three.js dependency)
 const EnhancedBackground = React.memo(() => {
   useEffect(() => {
-    // Create 3D space effect
-    const createSpace = () => {
+    const createStarField = () => {
       const spaceElement = document.querySelector('.space-background');
       if (!spaceElement) return;
       
-      // Clear existing elements
       spaceElement.innerHTML = '';
       
-      // Create stars (small dots)
-      for (let i = 0; i < 200; i++) {
+      const starCount = 300;
+      const starColors = [
+        THEME.accentBlue, 
+        THEME.neonPurple, 
+        THEME.neonPink, 
+        '#ffffff', 
+        'rgba(59, 130, 246, 0.5)', 
+        'rgba(136, 92, 246, 0.5)'
+      ];
+
+      for (let i = 0; i < starCount; i++) {
         const star = document.createElement('div');
-        star.className = 'star';
+        star.classList.add('star');
         
-        // Random size between 1px and 3px
         const size = Math.random() * 2 + 1;
-        
-        // Random position in 3D space
         const posX = Math.random() * 100;
         const posY = Math.random() * 100;
-        const posZ = Math.random() * 500 - 250;
+        const opacity = Math.random() * 0.7 + 0.2;
+        const color = starColors[Math.floor(Math.random() * starColors.length)];
         
-        // Random opacity between 0.3 and 0.8
-        const opacity = Math.random() * 0.5 + 0.3;
-        
-        // Random color from theme
-        const colors = [THEME.accentBlue, THEME.neonPurple, THEME.neonPink, '#ffffff'];
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        
-        // Set styles
-        Object.assign(star.style, {
-          width: `${size}px`,
-          height: `${size}px`,
-          left: `${posX}%`,
-          top: `${posY}%`,
-          opacity: opacity,
-          backgroundColor: color,
-          transform: `translateZ(${posZ}px)`,
-          boxShadow: `0 0 ${Math.random() * 5 + 5}px ${color}`,
-          animationDuration: `${Math.random() * 20 + 10}s`,
-          animationDelay: `${Math.random() * -10}s`
-        });
+        star.style.cssText = `
+          position: absolute;
+          width: ${size}px;
+          height: ${size}px;
+          left: ${posX}%;
+          top: ${posY}%;
+          background-color: ${color};
+          opacity: ${opacity};
+          border-radius: ${Math.random() > 0.7 ? '50%' : '0'};
+          box-shadow: 0 0 ${Math.random() * 8 + 4}px ${color};
+          animation: twinkle ${Math.random() * 5 + 3}s ease-in-out infinite;
+        `;
         
         spaceElement.appendChild(star);
       }
-      
-      // Create floating orbs
-      for (let i = 0; i < 12; i++) {
-        const orb = document.createElement('div');
-        orb.className = 'orb';
-        
-        // Random size between 50px and 150px
-        const size = Math.random() * 100 + 50;
-        
-        // Random position in 3D space
-        const posX = Math.random() * 120 - 10;
-        const posY = Math.random() * 120 - 10;
-        const posZ = Math.random() * 300 - 150;
-        
-        // Random opacity between 0.05 and 0.15
-        const opacity = Math.random() * 0.1 + 0.05;
-        
-        // Random color from theme
-        const colors = [THEME.accentBlue, THEME.neonPurple, THEME.neonPink];
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        
-        // Set styles
-        Object.assign(orb.style, {
-          width: `${size}px`,
-          height: `${size}px`,
-          left: `${posX}%`,
-          top: `${posY}%`,
-          opacity: opacity,
-          backgroundColor: color,
-          transform: `translateZ(${posZ}px)`,
-          filter: `blur(${Math.random() * 30 + 20}px)`,
-          animationDuration: `${Math.random() * 100 + 50}s`,
-          animationDelay: `${Math.random() * -25}s`
-        });
-        
-        spaceElement.appendChild(orb);
-      }
-      
-      // Create grid lines
-      const createGridLine = (isHorizontal) => {
-        const count = isHorizontal ? 10 : 10;
-        const spacing = 100 / (count - 1);
-        
-        for (let i = 0; i < count; i++) {
-          const line = document.createElement('div');
-          line.className = 'grid-line';
-          
-          Object.assign(line.style, {
-            [isHorizontal ? 'width' : 'height']: '100%',
-            [isHorizontal ? 'height' : 'width']: '1px',
-            [isHorizontal ? 'top' : 'left']: `${i * spacing}%`,
-            backgroundColor: `rgba(59, 130, 246, ${0.1 - Math.abs(i - count/2) * 0.01})`,
-            transform: isHorizontal ? 
-              `rotateX(90deg) translateZ(${-200 + i * 40}px)` : 
-              `rotateY(90deg) translateZ(${-200 + i * 40}px)`,
-            opacity: 0.2
-          });
-          
-          spaceElement.appendChild(line);
-        }
-      };
-      
-      // Create grid
-      createGridLine(true); // horizontal lines
-      createGridLine(false); // vertical lines
     };
     
-    createSpace();
+    createStarField();
     
-    // Handle mouse movement
-    let mouseX = 0;
-    let mouseY = 0;
-    const handleMouseMove = (e) => {
-      // Calculate mouse position relative to center
-      mouseX = (e.clientX / window.innerWidth - 0.5) * 10;
-      mouseY = (e.clientY / window.innerHeight - 0.5) * 10;
-      
-      // Update perspective origin for parallax effect
-      const spaceElement = document.querySelector('.space-background');
-      if (spaceElement) {
-        spaceElement.style.perspectiveOrigin = `calc(50% + ${mouseX}px) calc(50% + ${mouseY}px)`;
-      }
-    };
-    
-    window.addEventListener('mousemove', handleMouseMove);
-    
-    // Handle window resize
     const handleResize = () => {
-      createSpace();
+      createStarField();
     };
     
     window.addEventListener('resize', handleResize);
     
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
     };
   }, []);
 
   return (
     <div className="space-background absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      {/* 3D elements will be created here by JavaScript */}
-      
-      {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-radial from-transparent to-[#061429] opacity-70"></div>
     </div>
   );
 });
 
-// Animated Logo
 const Logo = ({ className = "", onClick = () => {} }) => (
   <motion.div 
     className={`cursor-pointer text-white text-lg font-bold flex items-center ${className}`}
@@ -248,7 +154,6 @@ export default function Home() {
   const backgroundOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.7]);
   const parallaxY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
-  // Firecracker animation function
   const createFireworks = (e) => {
     const fireworkContainer = document.createElement('div');
     fireworkContainer.className = 'firework-container';
@@ -258,27 +163,22 @@ export default function Home() {
     fireworkContainer.style.zIndex = '30';
     document.body.appendChild(fireworkContainer);
 
-    // Create multiple particles for the firework effect
     for (let i = 0; i < 30; i++) {
       const particle = document.createElement('div');
       particle.className = 'firework-particle';
       
-      // Random color for each particle
       const hue = Math.floor(Math.random() * 360);
       particle.style.backgroundColor = `hsl(${hue}, 100%, 60%)`;
       
-      // Random size
       const size = 2 + Math.random() * 4;
       particle.style.width = `${size}px`;
       particle.style.height = `${size}px`;
       
-      // Position and animation properties
       const angle = Math.random() * Math.PI * 2;
       const speed = 2 + Math.random() * 4;
       const vx = Math.cos(angle) * speed;
       const vy = Math.sin(angle) * speed;
       
-      // Set inline styles for the particle
       Object.assign(particle.style, {
         position: 'absolute',
         borderRadius: '50%',
@@ -288,7 +188,6 @@ export default function Home() {
       
       fireworkContainer.appendChild(particle);
       
-      // Animate the particle
       let x = 0;
       let y = 0;
       let opacity = 1;
@@ -320,16 +219,13 @@ export default function Home() {
   useEffect(() => {
     setIsLoaded(true);
     
-    // Add click event listener for firecracker effect
     document.addEventListener('click', createFireworks);
     
-    // Cleanup function
     return () => {
       document.removeEventListener('click', createFireworks);
     };
   }, []);
 
-  // Handle 3D animation effect based on mouse position
   const handleMouseMove = (e) => {
     if (cardRef.current) {
       const rect = cardRef.current.getBoundingClientRect();
@@ -337,14 +233,13 @@ export default function Home() {
       const y = e.clientY - rect.top;
       
       setMousePosition({
-        x: ((x / rect.width) - 0.5) * 20, // Transform to -10 to 10 range
+        x: ((x / rect.width) - 0.5) * 20,
         y: ((y / rect.height) - 0.5) * 20
       });
     }
   };
 
   const handleMouseLeave = () => {
-    // Reset position when mouse leaves
     setMousePosition({ x: 0, y: 0 });
   };
 
@@ -352,7 +247,12 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Animation variants
+  const handleGetInTouch = () => {
+    const subject = encodeURIComponent("Inquiry about AnyShare");
+    const body = encodeURIComponent("Hello Ranit,\n\nI would like to get in touch regarding...");
+    window.location.href = `mailto:ranit1697@gmail.com?subject=${subject}&body=${body}`;
+  };
+
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { 
@@ -377,7 +277,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0a192f]">
-      {/* Animated Navigation Bar */}
       <motion.nav 
         className="flex items-center justify-between p-4 z-20 sticky top-0 backdrop-blur-md bg-[#0a192f]/80 rounded-b-xl"
         initial={{ y: -100, opacity: 0 }}
@@ -595,23 +494,35 @@ export default function Home() {
             </motion.div>
           </div>
         </motion.div>
-
-        {/* Animated Footer */}
+        
+        {/* Sticky Footer with Get in Touch Button and AnyShare */}
         <motion.footer 
-          className="py-6 px-4 bg-[#061429] rounded-t-xl"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          className="sticky bottom-0 z-50 py-4 px-4 bg-[#061429]/90 backdrop-blur-md rounded-t-xl shadow-2xl"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
-            <Logo onClick={handleLogoClick} className="mb-4 md:mb-0" />
-            <motion.div 
-              className="text-blue-100/60 text-sm"
-              whileHover={{ color: "rgba(219, 234, 254, 0.8)" }}
+            <motion.button
+              onClick={handleGetInTouch}
+              className="flex items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full shadow-lg hover:from-blue-600 hover:to-purple-700 transition-all mb-4 md:mb-0"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              © {new Date().getFullYear()} AnyShare. All rights reserved.
-            </motion.div>
+              <Mail size={18} className="mr-2" />
+              Get in touch
+            </motion.button>
+            
+            <div className="flex items-center space-x-4">
+              <motion.div 
+                className="text-blue-100/60 text-sm mr-4"
+                whileHover={{ color: "rgba(219, 234, 254, 0.8)" }}
+              >
+                © {new Date().getFullYear()} AnyShare. All rights reserved.
+              </motion.div>
+              
+              <Logo onClick={handleLogoClick} />
+            </div>
           </div>
         </motion.footer>
       </div>
