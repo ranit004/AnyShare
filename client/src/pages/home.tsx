@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import FileUpload from "@/components/file-upload";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Github, Twitter, ArrowRight, Mail } from "lucide-react";
+import { Github, Twitter, ArrowRight, Mail, Linkedin } from "lucide-react";
 import FeatureCard from "@/components/feature-card";
 
 const THEME = {
@@ -54,29 +54,29 @@ const EnhancedBackground = React.memo(() => {
     const createStarField = () => {
       const spaceElement = document.querySelector('.space-background');
       if (!spaceElement) return;
-      
+
       spaceElement.innerHTML = '';
-      
+
       const starCount = 300;
       const starColors = [
-        THEME.accentBlue, 
-        THEME.neonPurple, 
-        THEME.neonPink, 
-        '#ffffff', 
-        'rgba(59, 130, 246, 0.5)', 
+        THEME.accentBlue,
+        THEME.neonPurple,
+        THEME.neonPink,
+        '#ffffff',
+        'rgba(59, 130, 246, 0.5)',
         'rgba(136, 92, 246, 0.5)'
       ];
 
       for (let i = 0; i < starCount; i++) {
         const star = document.createElement('div');
         star.classList.add('star');
-        
+
         const size = Math.random() * 2 + 1;
         const posX = Math.random() * 100;
         const posY = Math.random() * 100;
         const opacity = Math.random() * 0.7 + 0.2;
         const color = starColors[Math.floor(Math.random() * starColors.length)];
-        
+
         star.style.cssText = `
           position: absolute;
           width: ${size}px;
@@ -89,19 +89,19 @@ const EnhancedBackground = React.memo(() => {
           box-shadow: 0 0 ${Math.random() * 8 + 4}px ${color};
           animation: twinkle ${Math.random() * 5 + 3}s ease-in-out infinite;
         `;
-        
+
         spaceElement.appendChild(star);
       }
     };
-    
+
     createStarField();
-    
+
     const handleResize = () => {
       createStarField();
     };
-    
+
     window.addEventListener('resize', handleResize);
-    
+
     return () => {
       window.removeEventListener('resize', handleResize);
     };
@@ -114,22 +114,22 @@ const EnhancedBackground = React.memo(() => {
   );
 });
 
-const Logo = ({ className = "", onClick = () => {} }) => (
-  <motion.div 
+const Logo = ({ className = "", onClick = () => { } }) => (
+  <motion.div
     className={`cursor-pointer text-white text-lg font-bold flex items-center ${className}`}
     onClick={onClick}
     whileHover={{ scale: 1.05 }}
     whileTap={{ scale: 0.95 }}
   >
-    <motion.span 
+    <motion.span
       initial={{ color: THEME.accentBlue }}
-      animate={{ 
+      animate={{
         color: [THEME.accentBlue, THEME.neonPurple, THEME.neonPink, THEME.accentBlue],
       }}
-      transition={{ 
-        duration: 8, 
+      transition={{
+        duration: 8,
         repeat: Infinity,
-        ease: "linear" 
+        ease: "linear"
       }}
       className="text-xl mr-1"
     >
@@ -146,7 +146,7 @@ export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"]
@@ -182,42 +182,42 @@ export default function Home() {
     for (let i = 0; i < 30; i++) {
       const particle = document.createElement('div');
       particle.className = 'firework-particle';
-      
+
       const hue = Math.floor(Math.random() * 360);
       particle.style.backgroundColor = `hsl(${hue}, 100%, 60%)`;
-      
+
       const size = 2 + Math.random() * 4;
       particle.style.width = `${size}px`;
       particle.style.height = `${size}px`;
-      
+
       const angle = Math.random() * Math.PI * 2;
       const speed = 2 + Math.random() * 4;
       const vx = Math.cos(angle) * speed;
       const vy = Math.sin(angle) * speed;
-      
+
       Object.assign(particle.style, {
         position: 'absolute',
         borderRadius: '50%',
         transform: 'translate(-50%, -50%)',
         pointerEvents: 'none',
       });
-      
+
       fireworkContainer.appendChild(particle);
-      
+
       let x = 0;
       let y = 0;
       let opacity = 1;
       let frame = 0;
-      
+
       const animate = () => {
         frame++;
         x += vx;
         y += vy;
         opacity -= 0.02;
-        
+
         particle.style.transform = `translate(${x}px, ${y}px)`;
         particle.style.opacity = opacity;
-        
+
         if (opacity > 0 && frame < 100) {
           requestAnimationFrame(animate);
         } else {
@@ -227,16 +227,16 @@ export default function Home() {
           }
         }
       };
-      
+
       requestAnimationFrame(animate);
     }
   };
 
   useEffect(() => {
     setIsLoaded(true);
-    
+
     document.addEventListener('click', createFireworks);
-    
+
     return () => {
       document.removeEventListener('click', createFireworks);
     };
@@ -247,7 +247,7 @@ export default function Home() {
       const rect = cardRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      
+
       setMousePosition({
         x: ((x / rect.width) - 0.5) * 20,
         y: ((y / rect.height) - 0.5) * 20
@@ -271,10 +271,10 @@ export default function Home() {
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: { 
+      transition: {
         duration: 0.6,
         ease: "easeOut"
       }
@@ -294,37 +294,17 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-[#0a192f]">
       {/* Navigation remains the same */}
-      <motion.nav 
-        className="flex items-center justify-between p-4 z-20 sticky top-0 backdrop-blur-md bg-[#0a192f]/80 rounded-b-xl"
+      <motion.nav
+
+        className="fixed top-0 left-0 right-0 z-50 py-4 flex justify-center items-center"
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <div className="flex items-center space-x-6">
-          <motion.a 
-            href="https://github.com/ranit004" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-blue-400 transition-colors rounded-full p-2 hover:bg-blue-800/30"
-            whileHover={{ scale: 1.2, rotate: 5 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <Github size={24} />
-          </motion.a>
-          <motion.a 
-            href="https://x.com/Ranit_bro" 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-blue-400 transition-colors rounded-full p-2 hover:bg-blue-800/30"
-            whileHover={{ scale: 1.2, rotate: -5 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <Twitter size={24} />
-          </motion.a>
-        </div>
-        
+      
+
         <Logo onClick={handleLogoClick} />
-        
+
         <div className="w-10"></div>
       </motion.nav>
 
@@ -333,13 +313,13 @@ export default function Home() {
         {isLoaded && (
           <EnhancedBackground />
         )}
-        
+
         {/* Hero Section with enhanced animations */}
         <div className="relative z-10 flex items-center justify-center min-h-[85vh] p-4">
           {isLoaded && (
-            <motion.div 
+            <motion.div
               className="absolute inset-0 -z-10"
-              style={{ 
+              style={{
                 y: backgroundY,
                 opacity: backgroundOpacity,
               }}
@@ -350,7 +330,7 @@ export default function Home() {
             </motion.div>
           )}
 
-          <motion.div 
+          <motion.div
             className="w-full max-w-2xl perspective-container"
             initial="hidden"
             animate="visible"
@@ -369,24 +349,24 @@ export default function Home() {
             >
               <Card className="backdrop-blur-md bg-white/5 card-3d border-2 border-white/30 rounded-xl overflow-hidden shadow-xl">
                 <CardContent className="pt-6 space-y-6">
-                  <motion.div 
+                  <motion.div
                     className="text-center space-y-2"
                     variants={fadeInUp}
                   >
-                    <motion.h1 
+                    <motion.h1
                       className="text-5xl font-bold text-white flex justify-center items-center"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.8, ease: "easeOut" }}
                     >
-                      <motion.span 
-                        animate={{ 
+                      <motion.span
+                        animate={{
                           color: [THEME.accentBlue, THEME.neonPurple, THEME.neonPink, THEME.accentBlue],
                         }}
-                        transition={{ 
-                          duration: 8, 
+                        transition={{
+                          duration: 8,
                           repeat: Infinity,
-                          ease: "linear" 
+                          ease: "linear"
                         }}
                         className="mr-2"
                       >
@@ -394,7 +374,7 @@ export default function Home() {
                       </motion.span>
                       Share
                     </motion.h1>
-                    <motion.p 
+                    <motion.p
                       className="text-blue-100/80"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -403,9 +383,9 @@ export default function Home() {
                       Share files up to 10GB Securely
                     </motion.p>
                   </motion.div>
-                  
+
                   {/* File upload component */}
-                  <motion.div 
+                  <motion.div
                     variants={fadeInUp}
                     transition={{ delay: 0.4 }}
                     className="card-content"
@@ -419,41 +399,85 @@ export default function Home() {
         </div>
 
         {/* Features Section with staggered animations */}
-        <motion.div 
-          className="py-12 px-4 bg-[#0a192f]/70 bg-gradient-to-b from-[#0a192f]/90 to-[#0f2d5a]/80 relative rounded-t-xl"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={staggerContainer}
+        <motion.div
+  className="py-20 px-6 relative overflow-hidden"
+  style={{
+    backgroundColor: 'rgb(6, 6, 105)', 
+    backgroundImage: 'linear-gradient(to bottom, rgba(13, 37, 91, 0.95), rgba(11, 33, 82, 0.97))'
+  }}
+  initial="hidden"
+  whileInView="visible"
+  viewport={{ once: true, amount: 0.2 }}
+  variants={staggerContainer}
+  ref={footerRef}
+>
+  <div className="max-w-7xl mx-auto relative z-10">
+    <motion.h2
+      className="text-4xl font-bold text-center mb-16 text-white"
+      variants={fadeInUp}
+    >
+      How <span style={{ color: THEME?.accentBlue || '#3b82f6' }}>AnyShare</span> Works
+    </motion.h2>
+    <motion.div
+      className="grid grid-cols-1 md:grid-cols-3 gap-12"
+      variants={staggerContainer}
+    >
+      {(steps || []).map((step, index) => (
+        <motion.div
+          key={step?.title || `step-${index}`}
+          className="relative z-10 flex flex-col items-center"
+          variants={fadeInUp}
+          custom={index}
+          whileHover={{
+            scale: 1.05,
+            y: -10,
+            transition: {
+              type: "spring",
+              stiffness: 300
+            }
+          }}
         >
-          <div className="max-w-7xl mx-auto relative z-10">
-            <motion.h2 
-              className="text-3xl font-bold text-center mb-8 text-white"
-              variants={fadeInUp}
+          <div
+            className="w-16 h-16 mb-6 rounded-full flex items-center justify-center
+              bg-gradient-to-br from-blue-500/20 to-purple-600/20
+              border-2 border-white/30 shadow-lg relative
+              transform transition-all duration-300"
+          >
+            <span
+              className="text-xl font-bold text-white absolute"
+              style={{
+                color: THEME?.accentBlue || '#3b82f6',
+                textShadow: `0 0 10px ${THEME?.accentBlue || '#3b82f6'}`
+              }}
             >
-              Why Choose <span style={{ color: THEME.accentBlue }}>AnyShare</span>?
-            </motion.h2>
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-3 gap-6"
-              variants={staggerContainer}
-            >
-              {features.map((feature, index) => (
-                <motion.div 
-                  key={feature.title}
-                  variants={fadeInUp}
-                  custom={index}
-                  whileHover={{ scale: 1.03, y: -5 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <FeatureCard {...feature} />
-                </motion.div>
-              ))}
-            </motion.div>
+              {index + 1}
+            </span>
           </div>
+          <Card
+            className="w-full p-8 text-center
+              bg-[#0a192f]/70
+              backdrop-blur-md border border-white/20 rounded-xl
+              shadow-xl transform transition-all duration-300
+              hover:shadow-2xl hover:border-blue-500/50"
+          >
+            <h3
+              className="text-2xl font-semibold mb-4 text-white"
+              style={{ color: THEME?.accentBlue || '#3b82f6' }}
+            >
+              {step?.title || `Step ${index + 1}`}
+            </h3>
+            <p className="text-blue-100/80 text-base">
+              {step?.description || 'Description not available'}
+            </p>
+          </Card>
         </motion.div>
-        
+      ))}
+    </motion.div>
+  </div>
+</motion.div>
+
         {/* How It Works Section */}
-        <motion.div 
+        <motion.div
           className="py-12 px-4 bg-gradient-to-b from-[#0f2d5a]/80 to-[#0a192f]/95 relative"
           initial="hidden"
           whileInView="visible"
@@ -465,45 +489,93 @@ export default function Home() {
             {/* How It Works content remains the same */}
           </div>
         </motion.div>
-        
+
         {/* Sticky Footer with improved visibility */}
         <motion.footer 
-          className={`fixed bottom-0 left-0 right-0 z-50 py-4 px-4 
-            bg-[#061429]/90 backdrop-blur-md rounded-t-xl shadow-2xl 
-            transition-all duration-500 ease-in-out
-            ${isFooterVisible 
-              ? 'translate-y-0 opacity-100' 
-              : 'translate-y-full opacity-0'}`}
-          initial={{ opacity: 0, y: '100%' }}
-          animate={{ 
-            opacity: isFooterVisible ? 1 : 0, 
-            y: isFooterVisible ? 0 : '100%' 
-          }}
-          transition={{ duration: 0.5 }}
+  className="fixed bottom-0 left-0 right-0 z-50 py-4 px-4 bg-[#061429]/90 backdrop-blur-md shadow-[0_-4px_15px_rgba(59,130,246,0.2)] w-full"
+  initial={{ opacity: 0, y: '100%' }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ 
+    duration: 0.6, 
+    type: "spring", 
+    stiffness: 100 
+  }}
+  whileHover={{ 
+    boxShadow: '0 -6px 20px rgba(59,130,246,0.3)',
+    scale: 1.005
+  }}
+>
+  <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <motion.div 
+      className="text-emerald-200/80 text-sm"
+      whileHover={{ 
+        scale: 1.05,
+        color: "rgba(167, 243, 208, 0.9)"
+      }}
+    >
+      Built by <a 
+        href="https://x.com/Ranit_bro" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        className="hover:text-emerald-300 transition-colors font-medium text-emerald-300"
+      >
+        Ranit
+      </a>
+    </motion.div>
+    <motion.div 
+      className="flex items-center space-x-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.3 }}
+    >
+      <div className="flex flex-col items-center mr-2">
+        <motion.span 
+          className="text-emerald-200/70 text-sm mb-2 tracking-wider font-medium"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
         >
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
-            <motion.button
-              onClick={handleGetInTouch}
-              className="flex items-center bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full shadow-lg hover:from-blue-600 hover:to-purple-700 transition-all mb-4 md:mb-0"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+          Connect with me
+        </motion.span>
+        <div className="flex space-x-4">
+          {[
+            { 
+              Icon: Github, 
+              href: "https://github.com/ranit004",
+              hoverColor: "text-emerald-200 hover:text-emerald-400"
+            },
+            { 
+              Icon: Twitter, 
+              href: "https://x.com/Ranit_bro",
+              hoverColor: "text-emerald-200 hover:text-emerald-400"
+            },
+            { 
+              Icon: Linkedin, 
+              href: "https://www.linkedin.com/in/ranit-mondal-a084102b5/",
+              hoverColor: "text-emerald-200 hover:text-emerald-400"
+            }
+          ].map(({ Icon, href, hoverColor }) => (
+            <motion.a
+              key={href}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${hoverColor} transition-colors`}
+              whileHover={{ 
+                scale: 1.2, 
+                rotate: 5,
+                color: "rgb(16, 185, 129)"
+              }}
+              whileTap={{ scale: 0.9 }}
             >
-              <Mail size={18} className="mr-2" />
-              Get in touch
-            </motion.button>
-            
-            <div className="flex items-center space-x-4">
-              <motion.div 
-                className="text-blue-100/60 text-sm mr-4"
-                whileHover={{ color: "rgba(219, 234, 254, 0.8)" }}
-              >
-                © {new Date().getFullYear()} AnyShare. All rights reserved.
-              </motion.div>
-              
-              <Logo onClick={handleLogoClick} />
-            </div>
-          </div>
-        </motion.footer>
+              <Icon size={26} />
+            </motion.a>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  </div>
+</motion.footer>
       </div>
 
       {/* CSS for animations */}
